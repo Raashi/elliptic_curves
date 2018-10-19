@@ -5,14 +5,9 @@ import functools
 import utils
 
 
-small_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]  # длина - 33 бита
-mul_small_primes = functools.reduce(operator.mul, small_primes)
-
-miller_rabin_tests_count = 5
-
-debug_primes = False
-last_gcd_trials = 1
-last_small_trials = 1
+SMALL_PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]  # длина - 33 бита
+SMALL_PRIMES_PRODUCT = functools.reduce(operator.mul, SMALL_PRIMES)
+MR_TESTS = 5
 
 
 def check_len(q, desired_size):
@@ -36,7 +31,7 @@ def isprime(prime):
     s = q
 
     r = 0
-    while r < miller_rabin_tests_count:
+    while r < MR_TESTS:
         a = random.randint(2, prime - 2)
         while utils.gcd(a, prime) > 1:
             a = random.randint(2, prime - 2)
@@ -66,15 +61,10 @@ def gen_odd(size):
 
 def gen_relatively_prime(size):
     q = gen_odd(size)
-
-    global last_gcd_trials
-
-    while utils.gcd(q, mul_small_primes) > 1 or q % 4 != 3:
+    while utils.gcd(q, SMALL_PRIMES_PRODUCT) > 1 or q % 4 != 3:
         q += 2
-        last_gcd_trials += 1
         if not check_len(q, size):
             q = gen_odd(size)
-
     return q
 
 
@@ -91,55 +81,25 @@ def gen_big_prime(size):
     :return: простое l-битное число
     """
     q = gen_relatively_prime(size)
-
-    global last_gcd_trials
-    trials = 1
-    last_gcd_trials = 1
-
     while not isprime(q) or q % 4 != 1:
-        q += mul_small_primes
-        trials += 1
+        q += SMALL_PRIMES_PRODUCT
         if not check_len(q, size):
             q = gen_relatively_prime(size)
-
-    if debug_primes:
-        print('Cгенерировано. Проверок на простоту: {:>3}. Проверок НОД: {:>3}'.format(last_gcd_trials, trials))
-
     return q
 
 
 def gen_small_prime(size):
     q = gen_odd(size)
-
-    global last_small_trials
-    last_small_trials = 1
-
     while not isprime(q) or q % 4 != 1:
         q += 2
-        last_small_trials += 1
         if not check_len(q, size):
             q = gen_odd(size)
-
-    if debug_primes:
-        print('Сгенерировано. Проверок на простоту: {:>3}'.format(last_small_trials))
-
     return q
 
 
 def gen_prime(size):
-    if size < 150:
-        return gen_small_prime(size)
-    else:
-        return gen_big_prime(size)
+    return gen_small_prime(size) if size < 150 else gen_big_prime(size)
 
 
 if __name__ == '__main__':
-    import sympy
-    debug_primes = True
-    # for _idx in range(100):
-    #     test_len = random.randint(400, 1000)
-    #     prime = gen_prime(test_len)
-    #     assert check_len(test_len, prime)  # and sympy.isprime(prime)
-
-    p = gen_prime(200)
-    assert sympy.isprime(p)
+    pass

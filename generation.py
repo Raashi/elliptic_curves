@@ -3,7 +3,7 @@ import random
 
 import utils
 import prime
-import factorization
+from zi_factor import get_zi_factors, legendre
 from ecurve import EllipticCurve, ECPoint
 
 import sympy
@@ -33,16 +33,14 @@ def choose_m(size):
 
 
 def gen_pnr(size, m):
-    trials = 0
     while True:
-        trials += 1
         # 1 шаг
         p = prime.gen_prime(size)
         assert p % 4 == 1
         assert sympy.isprime(p)
 
         # 2 шаг (страница 168, алгоритм 7.8.1)
-        a, b = factorization.get_factors(p, 1)
+        a, b = get_zi_factors(p, 1)
         assert a * a + b * b == p
 
         # 3 шаг
@@ -59,12 +57,10 @@ def gen_pnr(size, m):
                             if pow(p, i, r) == 1:
                                 break
                         else:
-                            print('Попыток сгенерировать p, N, r = {}'.format(trials))
                             return p, n, r
 
 
 def gen_point(p, n, r):
-    trials = 1
     while True:
         x0 = random.randint(1, p - 1)
         y0 = random.randint(1, p - 1)
@@ -73,12 +69,9 @@ def gen_point(p, n, r):
         ec = EllipticCurve(a, p)
         p0 = ECPoint(x0, y0, ec)
 
-        if (n == 2 * r and factorization.legendre_symbol((-a) % p, p) == -1) or \
-                (n == 4 * r and factorization.legendre_symbol((-a) % p, p) == 1):
+        if (n == 2 * r and legendre(-a, p) == -1) or (n == 4 * r and legendre(-a, p) == 1):
             if p0 * n == ECPoint.zero():
-                print('Попыток сгенерировать Q =', trials)
                 return ec, p0
-        trials += 1
 
 
 def draw_points(q, r):

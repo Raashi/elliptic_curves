@@ -1,11 +1,12 @@
 import utils
 
 
-def legendre_symbol(a, p):
+def legendre(a, p):
     """
     источник: Маховенко Е.Б. 'Теоретическая криптография', стр. 83
     :return: значение символа Лежандра (1, -1, 0)
     """
+    a %= p
     if a % p == 0:
         return 0
     if utils.gcd(a, p) != 1:
@@ -22,7 +23,7 @@ def legendre_symbol(a, p):
 
 def gen_b(p):
     b = 1
-    while legendre_symbol(b, p) != -1:
+    while legendre(b, p) != -1:
         b += 1
     return b
 
@@ -38,10 +39,10 @@ def shenks_tonelli(p, n):
         r += 1
 
     # начальные значения: λ и ω
-    l = pow(n, s, p)
+    el = pow(n, s, p)
     w = pow(n, (s + 1) // 2, p)
     # находим порядок λ
-    mod = l
+    mod = el
     m = 0
     while mod != 1:
         mod = (mod * mod) % p
@@ -50,28 +51,28 @@ def shenks_tonelli(p, n):
     # находим квадратичный невычет
     z = gen_b(p)
     # находим коэф-ты, на которые будем умножать
-    yd_l = pow(pow(z, s, p), pow(2, r - m), p)
+    yd_el = pow(pow(z, s, p), pow(2, r - m), p)
     yd_w = pow(pow(z, s, p), pow(2, r - m - 1), p)
     # находим корень
-    while l != 1:
-        l = (l * yd_l) % p
+    while el != 1:
+        el = (el * yd_el) % p
         w = (w * yd_w) % p
 
     return w
 
 
-def get_factors(p, D):
-    if legendre_symbol(p - D, p) == -1:
+def get_zi_factors(p, d):
+    if legendre(p - d, p) == -1:
         return None, None
 
-    u = shenks_tonelli(p, -D)
-    assert (u * u) % p == (-D) % p
+    u = shenks_tonelli(p, -d)
+    assert (u * u) % p == (-d) % p
 
     u_i = [u]
     m_i = [p]
 
     while m_i[-1] != 1:
-        m_i.append((u_i[-1] ** 2 + D) // m_i[-1])
+        m_i.append((u_i[-1] ** 2 + d) // m_i[-1])
         u_i.append(min(u_i[-1] % m_i[-1], (m_i[-1] - u_i[-1]) % m_i[-1]))
     m_i.pop()
     u_i.pop()
@@ -79,7 +80,7 @@ def get_factors(p, D):
     a = u_i[-1]
     b = 1
     for idx in range(len(m_i) - 2, -1, -1):
-        a, b = get_new_ab(a, b, u_i[idx], D)
+        a, b = get_new_ab(a, b, u_i[idx], d)
 
     a %= p
     b %= p
@@ -89,11 +90,11 @@ def get_factors(p, D):
     return a, b
 
 
-def get_new_ab(ai, bi, u, D):
-    ratio = ai ** 2 + D * bi ** 2
+def get_new_ab(ai, bi, u, d):
+    ratio = ai ** 2 + d * bi ** 2
 
-    a1 = u * ai + D * bi
-    a2 = -u * ai + D * bi
+    a1 = u * ai + d * bi
+    a2 = -u * ai + d * bi
     if a1 % ratio == 0:
         a = a1 // ratio
     elif a2 % ratio == 0:
@@ -114,7 +115,7 @@ def get_new_ab(ai, bi, u, D):
     return a, b
 
 
-if __name__ == '__main__':
+def _test():
     # import prime
     # import sympy
     # for _idx in range(10):
@@ -128,3 +129,7 @@ if __name__ == '__main__':
     p = 65129
     res = shenks_tonelli(p, d)
     assert pow(res, 2, p) == d
+
+
+if __name__ == '__main__':
+    _test()

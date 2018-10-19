@@ -5,9 +5,7 @@ def gcd(x, y):
     return x
 
 
-def gcdex(a, b):
-    a, b = max(a, b), min(a, b)
-
+def egcd(a, b):
     r0, r1 = a, b
     x0, x1 = 1, 0
     y0, y1 = 0, 1
@@ -25,12 +23,9 @@ def gcdex(a, b):
 
 def get_inverse(a, m):  # in ring
     if a == 0:
-        raise ArithmeticError('Обратного элемента не существует')
-    if a == 1:
-        return 1
-
-    res = pow(a, m - 2, m)
-    if (a * res) % m != 1:
-        raise Exception('Неверно взят обратный элемент {} и {} = {}'.format(a, m, (a * res) % m))
-
-    return res
+        return 0
+    if gcd(a, m) != 1:
+        raise ArithmeticError('gcd(a={}, m={}) не равен 1 для нахождения обратного'.format(a, m))
+    d, x, y = egcd(a, m)
+    assert d == 1 and (x * a) % m == 1
+    return x % m
