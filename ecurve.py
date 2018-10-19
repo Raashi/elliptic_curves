@@ -6,6 +6,10 @@ class EllipticCurve:
         self.a = a
         self.p = p
 
+    def __eq__(self, other):
+        assert isinstance(other, EllipticCurve)
+        return self.a == other.a and self.p == other.p
+
 
 class ECPoint:
     def __init__(self, x, y, ec: EllipticCurve or None):

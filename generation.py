@@ -74,6 +74,15 @@ def gen_point(p, n, r):
                 return ec, p0
 
 
+def gen_curve(size, m=12):
+    """источник: Маховенко. "Теоретическая криптография", стр. 304, алгоритм 15.3.2"""
+    p, n, r = gen_pnr(size, m)
+    ec, p0 = gen_point(p, n, r)
+    q = p0 * (n // r)
+    assert q * r == ECPoint.zero()  # проверяем, что порядок точки Q равен r
+    return p, n, r, ec, q
+
+
 def draw_points(q, r):
         pyplot.figure()
         point = ECPoint.zero()
@@ -91,9 +100,6 @@ def print_points(q, r):
 
 
 def main():
-    """
-    источник: Маховенко. "Теоретическая криптография", стр. 304, алгоритм 15.3.2
-    """
     arg_draw = '-d' in sys.argv
     arg_print = '-p' in sys.argv
 
@@ -102,10 +108,7 @@ def main():
     m = choose_m(size)
     print('Выбрано m = {}'.format(m))
 
-    p, n, r = gen_pnr(size, m)
-    ec, p0 = gen_point(p, n, r)
-    q = p0 * (n // r)
-    assert q * r == ECPoint.zero()  # проверяем, что порядок точки Q равен r
+    p, n, r, ec, q = gen_curve(size, m)
 
     print('Порядок p поля =', p)
     print('Параметр А ЭК =', ec.a)

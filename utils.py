@@ -2,20 +2,27 @@ import os
 import sys
 
 NAME_PROTOCOL = os.path.basename(sys.argv[0])[:-3]
-os.mkdir('files_' + NAME_PROTOCOL)
+FULL_NAME_PROTOCOL = 'files_' + NAME_PROTOCOL
+if not os.path.exists(FULL_NAME_PROTOCOL):
+    os.mkdir(FULL_NAME_PROTOCOL)
 
 
 def read(filename):
-    with open(os.path.join('files_' + NAME_PROTOCOL, filename)) as f:
+    with open(os.path.join(FULL_NAME_PROTOCOL, filename)) as f:
         return int(f.read())
 
 
-def read_arr(*filenames):
+def read_struct(filename):
+    with open(os.path.join(FULL_NAME_PROTOCOL, filename)) as f:
+        return eval(f.read())
+
+
+def read_mul(*filenames):
     return (read(arg) for arg in filenames)
 
 
 def write(filename, value):
-    with open(os.path.join('files_' + NAME_PROTOCOL, filename), 'w') as f:
+    with open(os.path.join(FULL_NAME_PROTOCOL, filename), 'w') as f:
         f.write(str(value))
 
 
