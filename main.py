@@ -4,7 +4,7 @@ import random
 import utils
 import prime
 import factorization
-import elliptic_curve as ecurve
+from elliptic_curve import EllipticCurve, ECPoint
 
 import sympy
 import matplotlib.pyplot as pyplot
@@ -32,7 +32,7 @@ def choose_m(size):
                     return m_table[c][m_table_log.index(b)]
 
 
-def gen_pNr(size, m):
+def gen_pnr(size, m):
     trials = 0
     while True:
         trials += 1
@@ -46,10 +46,10 @@ def gen_pNr(size, m):
         assert a * a + b * b == p
 
         # 3 шаг
-        T = [2 * a, -2 * a, 2 * b, -2 * b]
-        for t in T:
-            N = p + 1 + t
-            rs = [N // 2, N // 4]
+        t_set = [2 * a, -2 * a, 2 * b, -2 * b]
+        for t in t_set:
+            n = p + 1 + t
+            rs = [n // 2, n // 4]
             for r in rs:
                 if prime.isprime(r):
                     assert sympy.isprime(r)
@@ -60,39 +60,41 @@ def gen_pNr(size, m):
                                 break
                         else:
                             print('Попыток сгенерировать p, N, r = {}'.format(trials))
-                            return p, N, r
+                            return p, n, r
 
 
-def gen_point(p, N, r):
+def gen_point(p, n, r):
     trials = 1
     while True:
         x0 = random.randint(1, p - 1)
         y0 = random.randint(1, p - 1)
-        A = ((y0 ** 2 - x0 ** 3) * utils.get_inverse(x0, p)) % p
+        a = ((y0 ** 2 - x0 ** 3) * utils.get_inverse(x0, p)) % p
 
-        if (N == 2 * r and factorization.legendre_symbol((-A) % p, p) == -1) or \
-                (N == 4 * r and factorization.legendre_symbol((-A) % p, p) == 1):
-            point = ecurve.mul_point((x0, y0), N, A, p)
-            if point == (None, None):
+        ec = EllipticCurve(a, p)
+        p0 = ECPoint(x0, y0, ec)
+
+        if (n == 2 * r and factorization.legendre_symbol((-a) % p, p) == -1) or \
+                (n == 4 * r and factorization.legendre_symbol((-a) % p, p) == 1):
+            if p0 * n == ECPoint.zero():
                 print('Попыток сгенерировать Q =', trials)
-                return x0, y0, A
+                return ec, p0
         trials += 1
 
 
-def draw_points(Q, r, a, p):
+def draw_points(q, r):
         pyplot.figure()
-        point = (None, None)
+        point = ECPoint.zero()
         for k in range(0, r):
-            pyplot.scatter(*point)
-            point = ecurve.add_points(point, Q, a, p)
+            pyplot.scatter(*point.coords)
+            point = point + q
         pyplot.show()
 
 
-def print_points(Q, r, a, p):
-        point = (None, None)
+def print_points(q, r):
+        point = ECPoint.zero()
         for k in range(0, r):
-            point = ecurve.add_points(point, Q, a, p)
-            print('{}-ая точка:'.format(k + 1), point)
+            point = point + q
+            print('{}-ая точка:'.format(k + 1), point.coords)
 
 
 def main():
@@ -107,20 +109,20 @@ def main():
     m = choose_m(size)
     print('Выбрано m = {}'.format(m))
 
-    p, N, r = gen_pNr(size, m)
-    x0, y0, A = gen_point(p, N, r)
-    Q = ecurve.mul_point((x0, y0), N // r, A, p)
-    assert ecurve.mul_point(Q, r, A, p) == (None, None)  # проверяем, что порядок точки Q равен r
+    p, n, r = gen_pnr(size, m)
+    ec, p0 = gen_point(p, n, r)
+    q = p0 * (n // r)
+    assert q * r == ECPoint.zero()  # проверяем, что порядок точки Q равен r
 
     print('Порядок p поля =', p)
-    print('Параметр А ЭК =', A)
-    print('Образующая точка Q =', Q)
+    print('Параметр А ЭК =', ec.a)
+    print('Образующая точка Q =', q.coords)
     print('Порядок r циклической подгруппы точек =', r)
 
     if arg_print:
-        print_points(Q, r, A, p)
+        print_points(q, r)
     if arg_draw:
-        draw_points(Q, r, A, p)
+        draw_points(q, r)
 
 
 if __name__ == '__main__':

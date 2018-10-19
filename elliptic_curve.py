@@ -1,63 +1,72 @@
 import utils
 
 
-def eq_points(p1, p2):
-    return p1[0] == p2[0] and p1[1] == p2[1]
+class EllipticCurve:
+    def __init__(self, a, p):
+        self.a = a
+        self.p = p
 
 
-def eq_points_2(p1, p2, p):
-    return p1[0] == p2[0] and p1[1] != p2[1] and pow(p1[1], 2, p) == pow(p2[1], 2, p)
+class ECPoint:
+    def __init__(self, x, y, ec: EllipticCurve or None):
+        self.ec = ec
+        self.x = x
+        self.y = y
+        self.coords = (self.x, self.y)
 
+    def __eq__(self, other):
+        assert isinstance(other, ECPoint)
+        return self.x == other.x and self.y == other.y
 
-def is_zero(point):
-    return point[0] is None and point[1] is None
+    def __neg__(self):
+        return ECPoint(self.x, -self.y % self.ec.p, self.ec)
 
+    @staticmethod
+    def zero():
+        return ECPoint(None, None, None)
 
-def add_points(p1, p2, a, p):
-    x1, y1, x2, y2 = p1[0], p1[1], p2[0], p2[1]
+    def __add__(self, other):
+        assert isinstance(other, ECPoint)
 
-    if is_zero(p1):
-        return p2
-    elif is_zero(p2):
-        return p1
-    if eq_points_2(p1, p2, p):
-        return None, None
-    if not eq_points(p1, p2):
-        lam = ((y2 - y1) % p) * utils.get_inverse((x2 - x1) % p, p) % p
-    else:
-        lam = (3 * x1 ** 2 + a) * utils.get_inverse((2 * y1) % p, p) % p
+        x1, y1, x2, y2 = self.x, self.y, other.x, other.y
 
-    x3 = (lam ** 2 - x1 - x2) % p
-    y3 = (lam * (x1 - x3) - y1) % p
+        if self == ECPoint.zero():
+            return ECPoint(other.x, other.y, other.ec)
+        elif other == ECPoint.zero():
+            return ECPoint(self.x, self.y, self.ec)
+        if self == -other:
+            return ECPoint.zero()
+        if self != other:
+            lam = ((y2 - y1) % self.ec.p) * utils.get_inverse((x2 - x1) % self.ec.p, self.ec.p) % self.ec.p
+        else:
+            lam = (3 * x1 ** 2 + self.ec.a) * utils.get_inverse((2 * y1) % self.ec.p, self.ec.p) % self.ec.p
 
-    return x3, y3
+        x3 = (lam ** 2 - x1 - x2) % self.ec.p
+        y3 = (lam * (x1 - x3) - y1) % self.ec.p
 
+        return ECPoint(x3, y3, self.ec)
 
-def mul_point(point, k, a, p):
-    point_g = point[:]
-    point_q = (None, None)
+    def __mul__(self, k):
+        assert isinstance(k, int)
 
-    kbin = bin(k)[2:]
-    m = len(kbin)
-    for i in range(m):
-        if kbin[m - i - 1] == '1':
-            point_q = add_points(point_q, point_g, a, p)
-        point_g = add_points(point_g, point_g, a, p)
+        g = ECPoint(self.x, self.y, self.ec)
+        q = ECPoint.zero()
 
-    return point_q
+        kbin = bin(k)[2:]
+        m = len(kbin)
+        for i in range(m):
+            if kbin[m - i - 1] == '1':
+                q = q + g
+            g = g + g
+
+        return q
 
 
 if __name__ == '__main__':
-    ppoint = (1, 2)
-    aa = 3
-    pp = 65129
-    NN = 64826
-    res = mul_point(ppoint, NN - 1, aa, pp)
-    assert res == (3, 6)
+    test_ec = EllipticCurve(3, 65129)
+    test_p = ECPoint(1, 2, test_ec)
+    test_k = 64826
+    assert test_p * (test_k + 1) == test_p
 
-    xx0 = 1
-    yy0 = 2
-    aa = 3
-    NN = 64826
-    pp = 65129
-    assert mul_point((xx0, yy0), NN, aa, pp) == (0, 0)
+    test_p = ECPoint(1, 2, test_ec)
+    assert test_p * test_k == ECPoint.zero()
