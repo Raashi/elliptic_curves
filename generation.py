@@ -106,12 +106,11 @@ def main():
     size = int(sys.argv[1])
     assert size > 4, 'Лучше выбирать длину числа-порядка поля > 4'
     m = choose_m(size)
-    print('Выбрано m = {}'.format(m))
 
     p, n, r, ec, q = gen_curve(size, m)
 
     print('Порядок p поля =', p)
-    print('Параметр А ЭК =', ec.a)
+    print('Параметр А кривой =', ec.a)
     print('Образующая точка Q =', q.coords)
     print('Порядок r циклической подгруппы точек =', r)
 

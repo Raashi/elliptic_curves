@@ -10,7 +10,7 @@ def legendre(a, p):
     if a % p == 0:
         return 0
     if utils.gcd(a, p) != 1:
-        raise Exception('Символ Лежандра имеет смысл для взаимно простых a и p')
+        raise ArithmeticError('Символ Лежандра имеет смысл для взаимно простых a и p')
 
     q = pow(a, (p - 1) // 2, p)
     if q == 1:
@@ -18,10 +18,10 @@ def legendre(a, p):
     elif q == p - 1:
         return -1
     else:
-        raise Exception('Неверно вычислен символ Лежандра')
+        raise ArithmeticError('Неверно вычислен символ Лежандра')
 
 
-def gen_b(p):
+def gen_quadratic_nonresidue(p):
     b = 1
     while legendre(b, p) != -1:
         b += 1
@@ -49,7 +49,7 @@ def shenks_tonelli(p, n):
         m += 1
 
     # находим квадратичный невычет
-    z = gen_b(p)
+    z = gen_quadratic_nonresidue(p)
     # находим коэф-ты, на которые будем умножать
     yd_el = pow(pow(z, s, p), pow(2, r - m), p)
     yd_w = pow(pow(z, s, p), pow(2, r - m - 1), p)
@@ -100,7 +100,7 @@ def get_new_ab(ai, bi, u, d):
     elif a2 % ratio == 0:
         a = a2 // ratio
     else:
-        raise Exception('Не могу посчитать a_i-1')
+        raise ArithmeticError('Не получилось вычислить a_i-1')
 
     b1 = -ai + u * bi
     b2 = -ai - u * bi
@@ -110,7 +110,7 @@ def get_new_ab(ai, bi, u, d):
     elif b2 % ratio == 0:
         b = b2 // ratio
     else:
-        raise Exception('Не могу посчитать b_i-1')
+        raise ArithmeticError('Не получилось вычислить b_i-1')
 
     return a, b
 
