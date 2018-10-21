@@ -46,3 +46,19 @@ def gen_curve(size):
     p, n, r, ec, g = generation.gen_curve(size)
     write('r.txt', r)
     write_point('G.txt', g)
+
+
+def get_e(r, m, hash_function):
+    with open(m, 'rb') as f:
+        m = f.read()
+    h = hash_function(m).digest()
+    return int.from_bytes(h, byteorder='big') % r
+
+
+def get_e_point(r, r_point, m, hash_function):
+    with open(m, 'rb') as f:
+        m = f.read()
+    h = hash_function(m
+                      + r_point.x.to_bytes(r_point.x.bit_length(), byteorder='big')
+                      + r_point.y.to_bytes(r_point.y.bit_length(), byteorder='big')).digest()
+    return int.from_bytes(h, byteorder='big') % r

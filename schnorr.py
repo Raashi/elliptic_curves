@@ -22,17 +22,8 @@ def sign_r(r, p):
     write_point('Rp.txt', r_point)
 
 
-def get_e(r, r_point, m):
-    with open(m, 'rb') as f:
-        m = f.read()
-    h = hash_function(m
-                      + r_point.x.to_bytes(r_point.x.bit_length(), byteorder='big')
-                      + r_point.y.to_bytes(r_point.y.bit_length(), byteorder='big')).digest()
-    return int.from_bytes(h, byteorder='big') % r
-
-
 def sign_e(r, r_point, m):
-    write('e.txt', get_e(r, r_point, m))
+    write('e.txt', get_e_point(r, r_point, m, hash_function))
 
 
 def sign(r, a, k, e):
@@ -41,7 +32,7 @@ def sign(r, a, k, e):
 
 
 def check_e(r, r_point, m):
-    write('es.txt', get_e(r, r_point, m))
+    write('es.txt', get_e_point(r, r_point, m, hash_function))
 
 
 def check(es, s, p, q, r_point):
@@ -53,9 +44,9 @@ def check(es, s, p, q, r_point):
 
 def main():
     operation = sys.argv[1]
-    if operation == '-gcurve':
+    if operation == '-gc':
         gen_curve(int(sys.argv[2]))
-    elif operation == '-gpoints':
+    elif operation == '-gp':
         gen_points(read('r.txt'), read_point('G.txt'))
     elif operation == '-sr':
         sign_r(read('r.txt'), read_point('P.txt'))
