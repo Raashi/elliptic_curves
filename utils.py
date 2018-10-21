@@ -1,31 +1,3 @@
-import os
-import sys
-
-NAME_PROTOCOL = os.path.basename(sys.argv[0])[:-3]
-FULL_NAME_PROTOCOL = 'files_' + NAME_PROTOCOL
-if not os.path.exists(FULL_NAME_PROTOCOL):
-    os.mkdir(FULL_NAME_PROTOCOL)
-
-
-def read(filename):
-    with open(os.path.join(FULL_NAME_PROTOCOL, filename)) as f:
-        return int(f.read())
-
-
-def read_struct(filename):
-    with open(os.path.join(FULL_NAME_PROTOCOL, filename)) as f:
-        return eval(f.read())
-
-
-def read_mul(*filenames):
-    return (read(arg) for arg in filenames)
-
-
-def write(filename, value):
-    with open(os.path.join(FULL_NAME_PROTOCOL, filename), 'w') as f:
-        f.write(str(value))
-
-
 def gcd(x, y):
     x, y = max(x, y), min(x, y)
     while y:
@@ -50,6 +22,7 @@ def egcd(a, b):
 
 
 def get_inverse(a, m):  # in ring
+    a %= m
     if a == 0:
         return 0
     if gcd(a, m) != 1:
@@ -57,3 +30,8 @@ def get_inverse(a, m):  # in ring
     d, x, y = egcd(a, m)
     assert d == 1 and (x * a) % m == 1
     return x % m
+
+
+def ratio(p, q, m):  # in ring
+    p, q = p % m, q % m
+    return (p * get_inverse(q, m)) % m

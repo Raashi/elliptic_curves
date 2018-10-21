@@ -1,20 +1,10 @@
 import random
 import hashlib
 
-from utils import *
-from ecurve import EllipticCurve, ECPoint
+from putils import *
 import generation
 
 hash_function = hashlib.sha256
-
-
-def read_point(filename):
-    p_xy, ec_ap = read_struct(filename)
-    return ECPoint(*p_xy, EllipticCurve(*ec_ap))
-
-
-def write_point(filename, p: ECPoint):
-    write(filename, (p.coords, (p.ec.a, p.ec.p)))
 
 
 def gen_curve(size):
@@ -86,7 +76,7 @@ def main():
         check(read('es.txt'), read('s.txt'), read_point('P.txt'), read_point('Q.txt'), read_point('Rp.txt'))
     elif operation == '-all':
         size = 10
-        m = '..\\test.m4a'
+        m = 'test.flac'
         modulo, n, r, ec, g = generation.gen_curve(size)
         p = g * random.randint(1, r - 1)
         a = random.randint(1, r - 1)

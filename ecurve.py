@@ -41,9 +41,9 @@ class ECPoint:
         if self == -other:
             return ECPoint.zero()
         if self != other:
-            lam = ((y2 - y1) % self.ec.p) * utils.get_inverse((x2 - x1) % self.ec.p, self.ec.p) % self.ec.p
+            lam = utils.ratio(y2 - y1, x2 - x1, self.ec.p)
         else:
-            lam = (3 * x1 ** 2 + self.ec.a) * utils.get_inverse((2 * y1) % self.ec.p, self.ec.p) % self.ec.p
+            lam = utils.ratio(3 * x1 ** 2 + self.ec.a, 2 * y1, self.ec.p)
 
         x3 = (lam ** 2 - x1 - x2) % self.ec.p
         y3 = (lam * (x1 - x3) - y1) % self.ec.p
