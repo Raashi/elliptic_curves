@@ -1,6 +1,7 @@
 import os
 import sys
 
+import generation
 from ecurve import EllipticCurve, ECPoint
 
 NAME_PROTOCOL = os.path.basename(sys.argv[0])[:-3]
@@ -35,3 +36,13 @@ def write(filename, value):
 
 def write_point(filename, p: ECPoint):
     write(filename, (p.coords, (p.ec.a, p.ec.p)))
+
+
+def exists(filename):
+    return os.path.exists(os.path.join(FULL_NAME_PROTOCOL, filename))
+
+
+def gen_curve(size):
+    p, n, r, ec, g = generation.gen_curve(size)
+    write('r.txt', r)
+    write_point('G.txt', g)

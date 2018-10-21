@@ -2,15 +2,8 @@ import random
 import hashlib
 
 from putils import *
-import generation
 
 hash_function = hashlib.sha256
-
-
-def gen_curve(size):
-    p, n, r, ec, g = generation.gen_curve(size)
-    write('r.txt', r)
-    write_point('G.txt', g)
 
 
 def gen_points(r, g):
@@ -77,7 +70,7 @@ def main():
     elif operation == '-all':
         size = 10
         m = 'test.flac'
-        modulo, n, r, ec, g = generation.gen_curve(size)
+        modulo, n, r, ec, g = gen_curve(size)
         p = g * random.randint(1, r - 1)
         a = random.randint(1, r - 1)
         q = p * a
