@@ -1,7 +1,6 @@
 import random
 
 from putils import *
-import generation
 
 
 def gen_x(g, r):
@@ -62,8 +61,8 @@ if __name__ == '__main__':
     elif operation == '-c':
         check(read_point('g.txt'), read('parcel.txt'), read_point('a.txt'), read_point('b.txt'), read('bit.txt'))
     elif operation == '-round':
-        g, r, x, b = read_point('g.txt'), read('r.txt'), read('x.txt'), read_point('b.txt')
-        round_a(g, r)
+        _g, _r, _x, _b = read_point('g.txt'), read('r.txt'), read('x.txt'), read_point('b.txt')
+        round_a(_g, _r)
         round_bit()
         round_parcel(*read_mul('bit.txt', 'x.txt', 'r.txt', 'ra.txt'))
-        check(g, read('parcel.txt'), read_point('a.txt'), b, read('bit.txt'))
+        check(_g, read('parcel.txt'), read_point('a.txt'), _b, read('bit.txt'))
