@@ -94,8 +94,8 @@ if __name__ == '__main__':
     elif operation == '-c':
         check(read_point('g.txt'), read('parcel.txt'), read_point('a.txt'), read_point('b.txt'), read('bit.txt'))
     elif operation == '-round':
-        rounds = get_check_rounds()
-        if rounds < 0:
+        _rounds = get_check_rounds()
+        if _rounds < 0:
             sys.exit(1)
         _g, _r, _x, _b = read_point('g.txt'), read('r.txt'), read('x.txt'), read_point('b.txt')
         round_a(_g, _r)
