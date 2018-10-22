@@ -38,6 +38,11 @@ def write_point(filename, p: ECPoint):
     write(filename, (p.coords, (p.ec.a, p.ec.p)))
 
 
+def delete(filename):
+    if os.path.exists(os.path.join(FULL_NAME_PROTOCOL, filename)):
+        os.remove(os.path.join(FULL_NAME_PROTOCOL, filename))
+
+
 def exists(filename):
     return os.path.exists(os.path.join(FULL_NAME_PROTOCOL, filename))
 
