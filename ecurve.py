@@ -2,13 +2,15 @@ import utils
 
 
 class EllipticCurve:
-    def __init__(self, a, p):
+    def __init__(self, a, p, b=0):
         self.a = a
         self.p = p
+        self.b = b
 
     def __eq__(self, other):
-        assert isinstance(other, EllipticCurve)
-        return self.a == other.a and self.p == other.p
+        if not isinstance(other, EllipticCurve):
+            raise ValueError('Сравнивать можно только с EllipticCurve объектами')
+        return self.a == other.a and self.p == other.p and self.b == other.b
 
 
 class ECPoint:
