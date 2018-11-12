@@ -27,6 +27,9 @@ class ECPoint:
     def __neg__(self):
         return ECPoint(self.x, -self.y % self.ec.p, self.ec)
 
+    def check_ec(self):
+        return (pow(self.x, 3, self.ec.p) + self.x * self.ec.a) % self.ec.p == pow(self.y, 2, self.ec.p)
+
     @staticmethod
     def zero():
         return ECPoint(None, None, None)

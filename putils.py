@@ -49,8 +49,10 @@ def exists(filename):
 
 def gen_curve(size):
     p, n, r, ec, g = generation.gen_curve(size)
+    write('ep.txt', p)
+    write('ea.txt', ec.a)
     write('r.txt', r)
-    write_point('G.txt', g)
+    write_point('g.txt', g)
 
 
 def get_e(r, m, hash_function):
